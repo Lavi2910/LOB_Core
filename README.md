@@ -27,9 +27,12 @@ $$VWAP = \frac{\sum (Price \times Quantity)}{\sum Quantity}$$
 - `main.cpp`: Stress-testing suite including order injection and cancellation tests.
 
 ## ⚙️ Build and Run
+
 To build the project, ensure you have a C++20 compatible compiler and CMake installed:
 ```bash
 mkdir build && cd build
 cmake ..
 make
 ./LOB_Core
+```
+<img width="1360" height="1040" alt="lob_core_architecture" src="https://github.com/user-attachments/assets/bd5a4bdc-001f-42f4-9a37-97fd8fd83076" />
