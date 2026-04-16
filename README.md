@@ -1,5 +1,10 @@
 # LOB-Core | High-Performance Matching Engine in C++20
 
+> A Limit Order Book is the core matching engine behind every stock exchange — 
+> it pairs buyers and sellers in real time based on price and arrival order. 
+> This implementation prioritizes the two operations that matter most in HFT: 
+> fast insertions and near-instant cancellations.
+
 A fast, memory-efficient Limit Order Book (LOB) implementation designed for high-frequency trading (HFT) scenarios. This project focuses on minimizing latency in order cancellation and providing trading analytics.
 
 ## 🚀 Key Technical Features
@@ -20,6 +25,32 @@ $$VWAP = \frac{\sum (Price \times Quantity)}{\sum Quantity}$$
 - **Data Structures:** Heaps (Priority Queues), Hash Sets, Vectors.
 - **Design Patterns:** Lazy Deletion, Decoupled Header/Implementation.
 - **Build System:** CMake.
+
+  ## 📟 Sample Output
+
+```
+--- Phase 1: Building Liquidity ---
+[ENTRY] ID:101 BUY  50 @ 100.5
+[ENTRY] ID:102 BUY  30 @ 100.4
+[ENTRY] ID:103 SELL 40 @ 101.2
+[ENTRY] ID:104 SELL 25 @ 101.5
+--- Phase 2: Testing Cancel (ID 103: SELL 40 @ 101.2) ---
+[SYSTEM] Order 103 Canceled.
+--- Phase 3: Aggressive BUY (Should skip canceled 103) ---
+[ENTRY] ID:105 BUY  40 @ 102
+   >>> [TRADE] Executed 25 units @ 101.5
+--- Phase 4: Final Liquidity Check ---
+Best Bid: 102.000000
+Best Ask: No asks remaining
+========================================
+       TRADING SESSION SUMMARY
+========================================
+Total Trades Executed: 1
+Total Volume Traded:   25 units
+VWAP (Average Price):  101.5
+Closing Price:         101.5
+========================================
+```
 
 ## 📂 Project Structure
 - `include/`: Header files with Doxygen-style documentation (`@brief`, `@param`).
