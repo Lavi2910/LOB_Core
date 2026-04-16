@@ -31,8 +31,12 @@ int main() {
     inject(ob, 102.0, 40, Side::BUY, 105);
 
     std::cout << "\n--- Phase 4: Final Liquidity Check ---" << std::endl;
-    std::cout << "Best Bid: " << ob.getBestBidPrice() << std::endl;
-    std::cout << "Best Ask: " << ob.getBestAskPrice() << std::endl;
+
+    double bestBid = ob.getBestBidPrice();
+    double bestAsk = ob.getBestAskPrice();
+
+    std::cout << "Best Bid: " << (bestBid == -1 ? "No bids remaining" : std::to_string(bestBid)) << std::endl;
+    std::cout << "Best Ask: " << (bestAsk == std::numeric_limits<double>::max() ? "No asks remaining" : std::to_string(bestAsk)) << std::endl;
 
     ob.printSummary();
 
