@@ -10,8 +10,8 @@
 struct AsksComparator {
     bool operator()(const Order &a, const Order &b) const {
         //Price-Time Priority: Low price first and then earlier on time.
-        if (a.price == b.price && a.timestamp > b.timestamp) return true;
-        if (b.price < a.price) return true;
+        if (a.priceTicks == b.priceTicks && a.seq > b.seq) return true;
+        if (b.priceTicks < a.priceTicks) return true;
         return false;
     }
 };
@@ -19,8 +19,8 @@ struct AsksComparator {
 struct BidsComparator {
     bool operator()(const Order &a, const Order &b) const {
         //Price-Time Priority: high price first and then earlier on time.
-        if (a.price == b.price && a.timestamp > b.timestamp) return true;
-        if (a.price < b.price) return true;
+        if (a.priceTicks == b.priceTicks && a.seq > b.seq) return true;
+        if (a.priceTicks < b.priceTicks) return true;
         return false;
     }
 };
@@ -31,6 +31,7 @@ private:
     std::priority_queue<Order, std::vector<Order>, AsksComparator> asks;
     std::unordered_set<uint64_t> canceledOrders;
     std::vector<Trade> trades;
+    uint64_t nextSeq = 0;
 
 public:
     /**
@@ -55,14 +56,14 @@ public:
     void printSummary() const;
 
     //Getters
-    double getBestBidPrice() const;
-    double getBestAskPrice() const;
-    int32_t getBestBidQuantity() const;
-    int32_t getBestAskQuantity() const;
+    int64_t getBestBidPrice() const;
+    int64_t getBestAskPrice() const;
+    int64_t getBestBidQuantity() const;
+    int64_t getBestAskQuantity() const;
 
     // Helper methods for internal matching logic
-    void setBestBidQuantity(int32_t quantity);
-    void setBestAskQuantity(int32_t quantity);
+    void setBestBidQuantity(int64_t quantity);
+    void setBestAskQuantity(int64_t quantity);
     void addBidOrder(const Order &order);
     void addAskOrder(const Order &order);
     void exhaustBuyOrder(Order &order);

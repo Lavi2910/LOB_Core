@@ -9,10 +9,9 @@
  * Contains all necessary data for completed trades.
  */
 struct Trade {
-    double price;           ///< Price of the filled trade.
-    int32_t quantity;       ///< Quantity traded.
+    int64_t priceTicks;     ///< Price of the filled trade in ticks.
+    int64_t quantity;       ///< Quantity traded.
     Side aggressorSide;     ///< The side who aggressed the trade.
-    uint64_t timestamp;     ///< Time of completion.
     uint64_t buyerId;       ///< Order ID of the buyer.
     uint64_t sellerId;      ///< Order ID of the seller.
 };

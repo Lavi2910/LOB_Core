@@ -14,8 +14,8 @@ enum class Side {BUY, SELL};
 struct Order {
     uint64_t id;            ///< Unique identifier for the order (64-bit to prevent overflow).
     Side side;              ///< BUY or SELL.
-    int32_t quantity;       ///< Number of units to trade.
-    double price;           ///< Price for the order.
-    uint64_t timestamp;     ///< Time of entry for priority.
+    int64_t quantity;       ///< Number of units to trade.
+    int64_t priceTicks;     ///< Price for the order in ticks.
+    uint64_t seq;           ///< Arrival sequence, assigned by the engine. Defines time priority.
 };
 #endif //ORDER_H

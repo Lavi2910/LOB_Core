@@ -3,35 +3,35 @@
 
 using namespace std;
 
-double OrderBook::getBestAskPrice() const {
+int64_t OrderBook::getBestAskPrice() const {
     if (this->asks.empty()) {
-        return numeric_limits<double>::max();
+        return numeric_limits<int64_t>::max();
     }
-    return this->asks.top().price;
+    return this->asks.top().priceTicks;
 }
 
-double OrderBook::getBestBidPrice() const {
+int64_t OrderBook::getBestBidPrice() const {
     if (this->bids.empty()) {
         return -1;
     }
-    return this->bids.top().price;
+    return this->bids.top().priceTicks;
 }
 
-int32_t OrderBook::getBestBidQuantity() const {
+int64_t OrderBook::getBestBidQuantity() const {
     if (this->bids.empty()) {
         return -1;
     }
     return this->bids.top().quantity;
 }
 
-int32_t OrderBook::getBestAskQuantity() const {
+int64_t OrderBook::getBestAskQuantity() const {
     if (this->asks.empty()) {
-        return numeric_limits<int32_t>::max();
+        return numeric_limits<int64_t>::max();
     }
     return this->asks.top().quantity;
 }
 
-void OrderBook::setBestBidQuantity(int32_t quantity) {
+void OrderBook::setBestBidQuantity(int64_t quantity) {
     if (quantity == 0) {
         bids.pop();
     }else {
@@ -41,7 +41,7 @@ void OrderBook::setBestBidQuantity(int32_t quantity) {
         bids.push(order);
     }
 }
-void OrderBook::setBestAskQuantity(int32_t quantity) {
+void OrderBook::setBestAskQuantity(int64_t quantity) {
     if (quantity == 0) {
         asks.pop();
     }else {
@@ -65,7 +65,7 @@ bool static isBuySide(const Order &order) {
 }
 
 void OrderBook::exhaustBuyOrder(Order &order) {
-    while (!this->asks.empty() && this->getBestAskPrice() <= order.price && order.quantity > 0) {
+    while (!this->asks.empty() && this->getBestAskPrice() <= order.priceTicks && order.quantity > 0) {
         // Check for canceled orders at the top of the heap (Lazy Deletion).
         // This avoids the expensive O(N) operation of removing an element from the middle of a heap.
         if (this->canceledOrders.contains(this->asks.top().id)) {
@@ -73,13 +73,12 @@ void OrderBook::exhaustBuyOrder(Order &order) {
             this->asks.pop();
             continue;// Move to the next best price level
         }
-        int32_t matchQuantity = min(order.quantity, this->getBestAskQuantity());
+        int64_t matchQuantity = min(order.quantity, this->getBestAskQuantity());
         if (matchQuantity > 0) {
             this->trades.push_back({
-                this->asks.top().price,
+                this->asks.top().priceTicks,
                 matchQuantity,
                 Side::BUY,
-                order.timestamp,
                 order.id,
                 this->asks.top().id
             });
@@ -93,7 +92,7 @@ void OrderBook::exhaustBuyOrder(Order &order) {
 }
 
 void OrderBook::exhaustSellOrder(Order &order) {
-    while (!this->bids.empty() && this->getBestBidPrice() >= order.price && order.quantity > 0) {
+    while (!this->bids.empty() && this->getBestBidPrice() >= order.priceTicks && order.quantity > 0) {
         // Check for canceled orders at the top of the heap (Lazy Deletion).
         // This avoids the expensive O(N) operation of removing an element from the middle of a heap.
         if (this->canceledOrders.contains(this->bids.top().id)) {
@@ -101,13 +100,12 @@ void OrderBook::exhaustSellOrder(Order &order) {
             this->bids.pop();
             continue;// Move to the next best price level
         }
-        int32_t matchQuantity = min(order.quantity, this->getBestBidQuantity());
+        int64_t matchQuantity = min(order.quantity, this->getBestBidQuantity());
         if (matchQuantity > 0) {
             this->trades.push_back({
-                getBestBidPrice(),
+                this->bids.top().priceTicks,
                 matchQuantity,
                 Side::SELL,
-                order.timestamp,
                 this->bids.top().id,
                 order.id
             });
@@ -121,6 +119,7 @@ void OrderBook::exhaustSellOrder(Order &order) {
 }
 
 void OrderBook::createOrder(Order &order) {
+    order.seq = nextSeq++;
     if (isBuySide(order)) {
         this->exhaustBuyOrder(order);
         if (order.quantity > 0) {
@@ -150,13 +149,13 @@ void OrderBook::printSummary() const {
 
     for (const auto& t : trades) {
         totalVolume += t.quantity;
-        weightedSum += (t.price * t.quantity);
+        weightedSum += (t.priceTicks * t.quantity);
     }
 
     if (totalVolume > 0) {
         std::cout << "Total Volume Traded:   " << totalVolume << " units" << std::endl;
         std::cout << "VWAP (Average Price):  " << (weightedSum / totalVolume) << std::endl;
-        std::cout << "Closing Price:         " << trades.back().price << std::endl;
+        std::cout << "Closing Price:         " << trades.back().priceTicks << std::endl;
     } else {
         std::cout << "No trades were executed during this session." << std::endl;
     }
