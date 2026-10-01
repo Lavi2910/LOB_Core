@@ -1,11 +1,11 @@
 #ifndef ORDERBOOK_H
 #define ORDERBOOK_H
-#include "Order.h"
+#include <lob/Order.h>
 #include <iostream>
 #include <queue>
 #include <set>
 #include <unordered_set>
-#include "Trade.h"
+#include <lob/Trade.h>
 
 struct AsksComparator {
     bool operator()(const Order &a, const Order &b) const {

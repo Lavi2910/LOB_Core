@@ -1,7 +1,7 @@
 #ifndef TRADE_H
 #define TRADE_H
 #include <cstdint>
-#include "Order.h"
+#include <lob/Order.h>
 
 
 /**
